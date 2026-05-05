@@ -1,37 +1,31 @@
 // ============================================================
-// src/store.js
+// src/store.js  —  SOLUTION BRANCH
 // ============================================================
-// This is the Redux store configuration file.
-// Your task: register the movieApi reducer and middleware.
+// Configure the Redux store with RTK Query middleware.
 //
-// ── HINTS ─────────────────────────────────────────────────
-//   • import { configureStore } from '@reduxjs/toolkit'
-//   • import { movieApi } from './services/movieApi'
-//   • Add movieApi.reducer under the key movieApi.reducerPath
-//   • Add movieApi.middleware to the middleware chain using
-//     getDefaultMiddleware().concat(movieApi.middleware)
+// Why do we need the middleware?
+// ─────────────────────────────
+// RTK Query uses the middleware to:
+//   1. Handle cache lifecycle (invalidation, refetching)
+//   2. Manage in-flight request deduplication
+//   3. Clean up cached data after its lifetime expires
 //
-// ── EXAMPLE SHAPE ─────────────────────────────────────────
-//   export const store = configureStore({
-//     reducer: {
-//       [movieApi.reducerPath]: movieApi.reducer,  // TODO
-//     },
-//     middleware: (getDefaultMiddleware) =>
-//       getDefaultMiddleware().concat(movieApi.middleware), // TODO
-//   });
+// Without it, queries and mutations still work but caching,
+// tag invalidation, and automatic re-fetches do NOT.
 // ============================================================
 
 import { configureStore } from '@reduxjs/toolkit';
-
-// TODO: import movieApi from './services/movieApi' once you implement it
+import { movieApi } from './services/movieApi';
 
 export const store = configureStore({
   reducer: {
-    // TODO: add movieApi.reducer here
-    // [movieApi.reducerPath]: movieApi.reducer,
+    // Register the API slice's reducer under its own key.
+    // movieApi.reducerPath is just the string 'movieApi' — using the
+    // computed property makes it resilient if you ever rename it.
+    [movieApi.reducerPath]: movieApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware(),
-    // TODO: add movieApi.middleware here
-    // .concat(movieApi.middleware),
+    // Spread RTK's default middleware (thunk, serializability checks)
+    // then append RTK Query's middleware which manages the cache.
+    getDefaultMiddleware().concat(movieApi.middleware),
 });

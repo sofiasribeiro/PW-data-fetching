@@ -1,67 +1,70 @@
 // ============================================================
-// WatchlistPage — starter branch (placeholder data)
+// WatchlistPage — SOLUTION BRANCH
 // ============================================================
+// Fully wired with RTK Query.
 //
-// TODO: replace placeholder data with real RTK Query hooks:
-//
-//   import {
-//     useGetWatchlistQuery,
-//     useRemoveFromWatchlistMutation,
-//   } from '../../services/movieApi';
-//
-//   const { data: watchlist = [], isLoading } = useGetWatchlistQuery();
-//   const [removeFromWatchlist, { isLoading: isRemoving }] =
-//     useRemoveFromWatchlistMutation();
-//
-//   Then wire:
-//   - movies  ← watchlist
-//   - isLoading from the hook
-//   - onRemove → calls removeFromWatchlist(id) then addToast(...)
+// Key ideas:
+//   1. useGetWatchlistQuery — fetches /watchlist from json-server
+//   2. useRemoveFromWatchlistMutation — deletes one item by id
+//   3. Tag invalidation: after removeFromWatchlist succeeds,
+//      RTK Query automatically re-fetches getWatchlist because
+//      removeFromWatchlist invalidates the 'Watchlist' tag.
 // ============================================================
 
+import {
+  useGetWatchlistQuery,
+  useRemoveFromWatchlistMutation,
+} from '../../services/movieApi';
 import MovieCard from '../../components/MovieCard/MovieCard';
 import MovieGrid from '../../components/MovieGrid/MovieGrid';
+import SkeletonCard from '../../components/SkeletonCard/SkeletonCard';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import { useToast } from '../../context/useToast';
-import { PLACEHOLDER_WATCHLIST } from '../../data/placeholders';
 import styles from './WatchlistPage.module.css';
 
 function WatchlistPage() {
   const { addToast } = useToast();
 
-  // ── PLACEHOLDER DATA (remove when you implement RTK Query) ──
-  // The real hook will be: useGetWatchlistQuery()
-  const isLoading = false;
-  const movies = PLACEHOLDER_WATCHLIST;
-  // ────────────────────────────────────────────────────────────
+  // ── Watchlist query ───────────────────────────────────────
+  // Default to [] so we never get undefined in the template below.
+  const { data: watchlist = [], isLoading } = useGetWatchlistQuery();
 
-  // TODO: replace this handler with useRemoveFromWatchlistMutation()
-  function handleRemove(id) {
-    // Real implementation: await removeFromWatchlist(id).unwrap()
-    const movie = movies.find((m) => m.id === id);
-    if (movie) addToast(`"${movie.title}" removed from watchlist`, 'remove');
+  // ── Remove mutation ───────────────────────────────────────
+  const [removeFromWatchlist] = useRemoveFromWatchlistMutation();
+
+  // ── Handler ───────────────────────────────────────────────
+  async function handleRemove(id) {
+    const movie = watchlist.find((m) => m.id === id);
+    try {
+      await removeFromWatchlist(id).unwrap();
+      if (movie) addToast(`"${movie.title}" removed from watchlist`, 'remove');
+    } catch {
+      addToast('Could not remove film. Is json-server running?', 'remove');
+    }
   }
 
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.heading}>My Watchlist</h1>
-        {movies.length > 0 && (
-          <span className={styles.count} aria-label={`${movies.length} films`}>
-            {movies.length} {movies.length === 1 ? 'film' : 'films'}
+        {watchlist.length > 0 && (
+          <span className={styles.count} aria-label={`${watchlist.length} films`}>
+            {watchlist.length} {watchlist.length === 1 ? 'film' : 'films'}
           </span>
         )}
       </div>
 
       {/* Loading state */}
       {isLoading && (
-        <p className={styles.loading} aria-live="polite">
-          Loading watchlist…
-        </p>
+        <MovieGrid label="Loading watchlist">
+          {Array.from({ length: 4 }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </MovieGrid>
       )}
 
       {/* Empty state */}
-      {!isLoading && movies.length === 0 && (
+      {!isLoading && watchlist.length === 0 && (
         <EmptyState
           icon="🔖"
           title="Your watchlist is empty"
@@ -70,9 +73,9 @@ function WatchlistPage() {
       )}
 
       {/* Watchlist grid */}
-      {!isLoading && movies.length > 0 && (
+      {!isLoading && watchlist.length > 0 && (
         <MovieGrid label="Your watchlist">
-          {movies.map((movie) => (
+          {watchlist.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
