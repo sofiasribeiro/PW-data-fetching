@@ -20,10 +20,11 @@ cp .env.example .env.local
 npm run start
 ```
 
-Open **http://localhost:5173** | You'll see the app with placeholder data.  
+Open **http://localhost:5173**
+You'll see the app with placeholder data.  
 The json-server mock API runs on **http://localhost:3001**.
 
-> **Get a free OMDb key** at http://www.omdbapi.com/apikey.aspx <
+> **Get a free OMDb key** at http://www.omdbapi.com/apikey.aspx
 
 ---
 
