@@ -8,9 +8,9 @@ The UI is done. Your job is to build the data layer.
 ## Setup
 
 ```
-git clone https://github.com/sofiasribeiro/PW-data-fetching.git [][Clone the repo]
+git clone https://github.com/sofiasribeiro/PW-data-fetching.git
 cd PW-data-fetching
-npm install [][Install dependencies]
+npm install
 
 # Add your OMDb API key
 cp .env.example .env.local
@@ -23,11 +23,11 @@ npm run start
 Open **http://localhost:5173** | You'll see the app with placeholder data.  
 The json-server mock API runs on **http://localhost:3001**.
 
-> **Get a free OMDb key** at http://www.omdbapi.com/apikey.aspx — it's instant.
+> **Get a free OMDb key** at http://www.omdbapi.com/apikey.aspx <
 
 ---
 
-## File map — where you write code
+## File map: Where you write code
 
 These are the **only four files** you need to touch:
 
