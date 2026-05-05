@@ -1,0 +1,16 @@
+{
+  "watchlist": [
+    {
+      "id": "tt0111161",
+      "title": "The Shawshank Redemption",
+      "year": "1994",
+      "poster": "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"
+    },
+    {
+      "id": "tt0068646",
+      "title": "The Godfather",
+      "year": "1972",
+      "poster": "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+    }
+  ]
+}

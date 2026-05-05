@@ -1,0 +1,74 @@
+/* ============================================================
+   Color tokens — one source of truth for the whole app.
+   If you want to theme the app, change values here only.
+   ============================================================ */
+
+:root {
+  /* Background */
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f2f5;
+
+  /* Accent (dark indigo) */
+  --color-accent: #1a1f36;
+  --color-accent-light: #3d4471;
+  --color-accent-muted: #e8eaf6;
+
+  /* Text */
+  --color-text-primary: #1a1f36;
+  --color-text-secondary: #6b7280;
+  --color-text-inverse: #ffffff;
+
+  /* Borders */
+  --color-border: #e5e7eb;
+
+  /* Semantic */
+  --color-success: #059669;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+
+  /* Skeleton shimmer */
+  --color-skeleton-base: #e5e7eb;
+  --color-skeleton-shine: #f3f4f6;
+
+  /* Toast */
+  --color-toast-add: #ecfdf5;
+  --color-toast-add-border: #6ee7b7;
+  --color-toast-remove: #fef2f2;
+  --color-toast-remove-border: #fca5a5;
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-nav: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+}
