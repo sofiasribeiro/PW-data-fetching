@@ -1,57 +1,174 @@
 // ============================================================
-// SearchPage — starter branch (placeholder data)
+// SearchPage — SOLUTION BRANCH
 // ============================================================
+// This page is fully wired with RTK Query.
 //
-// TODO: replace placeholder data with real RTK Query hooks:
-//
-//   import {
-//     useSearchMoviesQuery,
-//     useAddToWatchlistMutation,
-//   } from '../../services/movieApi';
-//
-//   const [term, setTerm] = useState('');
-//   const [debouncedTerm, setDebouncedTerm] = useState('');
-//   // debounce term → setDebouncedTerm after 500 ms
-//
-//   const { data, isLoading, isError } = useSearchMoviesQuery(
-//     debouncedTerm,
-//     { skip: !debouncedTerm }   // skip the request when input is empty
-//   );
-//
-//   const [addToWatchlist, { isLoading: isAdding }] =
-//     useAddToWatchlistMutation();
-//
-//   Then wire:
-//   - movies  ← data (or [] when empty/error)
-//   - isLoading, isError from the hook
-//   - onAdd → calls addToWatchlist(movie) then addToast(...)
+// Key ideas demonstrated:
+//   1. useSearchMoviesQuery with `skip` option
+//      → avoids sending a request when the search box is empty
+//   2. Debouncing the term before passing it to the query
+//      → avoids hitting OMDb on every keystroke
+//   3. useAddToWatchlistMutation
+//      → isLoading state per-mutation invocation
+//   4. useGetWatchlistQuery
+//      → used *only* to mark cards already in the watchlist
+//        (the list itself is shown on /watchlist)
 // ============================================================
 
-import { useState } from 'react';
+// ============================================================
+// VERSION 1 — useState + useEffect only (no RTK Query)
+// ============================================================
+// A first solution before introducing RTK Query.
+// Covers: results on query change, loading state, error state,
+// and skip the fetch when the query is empty.
+//
+// import { useState, useEffect } from 'react';
+// import MovieCard from '../../components/MovieCard/MovieCard';
+// import MovieGrid from '../../components/MovieGrid/MovieGrid';
+// import EmptyState from '../../components/EmptyState/EmptyState';
+// import styles from './SearchPage.module.css';
+//
+// function SearchPage() {
+//   const [query, setQuery] = useState('');
+//   const [movies, setMovies] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//
+//   useEffect(() => {
+//     // Don't fetch on empty query
+//     if (!query.trim()) {
+//       setMovies([]);
+//       return;
+//     }
+//
+//     let cancelled = false;
+//
+//     async function fetchMovies() {
+//       setIsLoading(true);
+//       setError(null);
+//       try {
+//         const res = await fetch(
+//           `https://www.omdbapi.com/?apikey=${import.meta.env.VITE_OMDB_KEY}&s=${encodeURIComponent(query)}`
+//         );
+//         if (!res.ok) throw new Error('Network response was not ok');
+//         const data = await res.json();
+//         if (!cancelled) {
+//           if (data.Response === 'False') {
+//             setMovies([]);
+//           } else {
+//             setMovies(
+//               (data.Search || []).map((m) => ({
+//                 id: m.imdbID,
+//                 title: m.Title,
+//                 year: m.Year,
+//                 poster: m.Poster,
+//               }))
+//             );
+//           }
+//         }
+//       } catch (err) {
+//         if (!cancelled) setError(err.message);
+//       } finally {
+//         if (!cancelled) setIsLoading(false);
+//       }
+//     }
+//
+//     fetchMovies();
+//     return () => { cancelled = true; }; // cleanup: ignore stale responses
+//   }, [query]);
+//
+//   return (
+//     <div className={styles.page}>
+//       <input
+//         type="search"
+//         value={query}
+//         onChange={(e) => setQuery(e.target.value)}
+//         placeholder="Search any movie…"
+//       />
+//
+//       {isLoading && <p>Loading...</p>}
+//
+//       {error && !isLoading && <p>Error: {error}</p>}
+//
+//       {!isLoading && !error && movies.length === 0 && (
+//         <EmptyState icon="🎬" title="Search for a film to start" />
+//       )}
+//
+//       {!isLoading && !error && movies.length > 0 && (
+//         <MovieGrid label="Search results">
+//           {movies.map((movie) => (
+//             <MovieCard key={movie.id} movie={movie} onAdd={() => {}} />
+//           ))}
+//         </MovieGrid>
+//       )}
+//     </div>
+//   );
+// }
+//
+// export default SearchPage;
+// ============================================================
+
+import { useState, useEffect } from 'react';
+import {
+  useSearchMoviesQuery,
+  useAddToWatchlistMutation,
+  useGetWatchlistQuery,
+} from '../../services/movieApi';
 import MovieCard from '../../components/MovieCard/MovieCard';
 import MovieGrid from '../../components/MovieGrid/MovieGrid';
 import SkeletonCard from '../../components/SkeletonCard/SkeletonCard';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import { useToast } from '../../context/useToast';
-import { PLACEHOLDER_SEARCH_RESULTS } from '../../data/placeholders';
 import styles from './SearchPage.module.css';
 
 function SearchPage() {
   const [term, setTerm] = useState('');
+  // Debounced value — only changes 500 ms after the user stops typing.
+  const [debouncedTerm, setDebouncedTerm] = useState('');
   const { addToast } = useToast();
 
-  // ── PLACEHOLDER DATA (remove when you implement RTK Query) ──
-  // The real hook will be: useSearchMoviesQuery(debouncedTerm, { skip: !debouncedTerm })
-  const isLoading = false;
-  const isError = false;
-  const movies = term.length === 0 ? [] : PLACEHOLDER_SEARCH_RESULTS;
-  // ────────────────────────────────────────────────────────────
+  // ── Debounce ────────────────────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedTerm(term.trim()), 500);
+    return () => clearTimeout(timer); // cancel if term changes before 500 ms
+  }, [term]);
 
-  // TODO: replace this handler with useAddToWatchlistMutation()
-  function handleAdd(movie) {
-    // Real implementation: await addToWatchlist(movie).unwrap()
-    addToast(`"${movie.title}" added to watchlist`, 'add');
+  // ── Search query ─────────────────────────────────────────
+  // `skip: !debouncedTerm` means: don't fire a request when the
+  // input is empty. This keeps the empty-state clean on first load.
+  const {
+    data: movies = [],
+    isLoading,
+    isError,
+    isFetching,
+  } = useSearchMoviesQuery(debouncedTerm, {
+    skip: !debouncedTerm,
+  });
+
+  // ── Add mutation ─────────────────────────────────────────
+  // addToWatchlist is a function we call; isAdding is its loading flag.
+  const [addToWatchlist] = useAddToWatchlistMutation();
+
+  // ── Watchlist query (for badge) ───────────────────────────
+  // We fetch the watchlist here too, just to know which search
+  // results are already saved (so we can show the "Added" badge).
+  const { data: watchlist = [] } = useGetWatchlistQuery();
+  const watchlistIds = new Set(watchlist.map((m) => m.id));
+
+  // ── Handlers ─────────────────────────────────────────────
+  async function handleAdd(movie) {
+    // Check for duplicate before posting
+    if (watchlistIds.has(movie.id)) return;
+    try {
+      // .unwrap() re-throws any error so we can catch it below.
+      await addToWatchlist(movie).unwrap();
+      addToast(`"${movie.title}" added to watchlist`, 'add');
+    } catch {
+      addToast('Could not add film. Is json-server running?', 'remove');
+    }
   }
+
+  const showLoading = isLoading || (isFetching && movies.length === 0);
 
   return (
     <div className={styles.page}>
@@ -98,8 +215,8 @@ function SearchPage() {
         </div>
       </div>
 
-      {/* Loading state */}
-      {isLoading && (
+      {/* Loading skeletons */}
+      {showLoading && (
         <MovieGrid label="Loading results">
           {Array.from({ length: 8 }, (_, i) => (
             <SkeletonCard key={i} />
@@ -108,7 +225,7 @@ function SearchPage() {
       )}
 
       {/* Error state */}
-      {isError && !isLoading && (
+      {isError && !showLoading && (
         <EmptyState
           icon="⚠️"
           title="Couldn't reach OMDb"
@@ -116,8 +233,8 @@ function SearchPage() {
         />
       )}
 
-      {/* Empty / prompt state */}
-      {!isLoading && !isError && movies.length === 0 && (
+      {/* Prompt / empty state */}
+      {!showLoading && !isError && movies.length === 0 && (
         <EmptyState
           icon="🎬"
           title="Search for a film to start"
@@ -125,14 +242,15 @@ function SearchPage() {
         />
       )}
 
-      {/* Results grid */}
-      {!isLoading && !isError && movies.length > 0 && (
+      {/* Results */}
+      {!showLoading && !isError && movies.length > 0 && (
         <MovieGrid label="Search results">
           {movies.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
               onAdd={handleAdd}
+              inWatchlist={watchlistIds.has(movie.id)}
             />
           ))}
         </MovieGrid>
