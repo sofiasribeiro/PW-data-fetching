@@ -21,6 +21,7 @@ npm run start
 ```
 
 Open **http://localhost:5173**
+
 You'll see the app with placeholder data.  
 The json-server mock API runs on **http://localhost:3001**.
 
