@@ -1,28 +1,26 @@
-# 🎬 Movie Watchlist — Data Fetching with RTK Query
+# 🎬 Movie Watchlist: Data Fetching with RTK Query
 
-This is the starter for the **Data Fetching with RTK Query** class (Projeto Web, MCTW @UA). The UI is done. Your job is to build the data layer.
+This is the starter for the **Data Fetching with RTK Query** class (Projeto Web, MCTW @UA).
+The UI is done. Your job is to build the data layer.
 
 ---
 
 ## Setup
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/sofiasribeiro/PW-data-fetching.git
+```
+git clone https://github.com/sofiasribeiro/PW-data-fetching.git [][Clone the repo]
 cd PW-data-fetching
+npm install [][Install dependencies]
 
-# 2. Install dependencies
-npm install
-
-# 3. Add your OMDb API key
+# Add your OMDb API key
 cp .env.example .env.local
 # Then open .env.local and set VITE_OMDB_KEY=your_key_here
 
-# 4. Start the app (Vite dev server + json-server run in parallel)
+# Start the app (Vite dev server + json-server run in parallel)
 npm run start
 ```
 
-Open **http://localhost:5173** — you'll see the app with placeholder data.  
+Open **http://localhost:5173** | You'll see the app with placeholder data.  
 The json-server mock API runs on **http://localhost:3001**.
 
 > **Get a free OMDb key** at http://www.omdbapi.com/apikey.aspx — it's instant.
@@ -96,7 +94,7 @@ Read the code, understand the pattern, then:
 git checkout main
 ```
 
-and try again from memory. Don't copy-paste — the goal is to internalise the pattern.
+and try again from memory. Don't copy-paste, the goal is to internalise the pattern.
 
 ---
 
