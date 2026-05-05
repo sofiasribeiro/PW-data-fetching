@@ -1,6 +1,5 @@
 // Placeholder movie data used on the main (starter) branch so the UI
-// looks complete and realistic before students wire the data layer.
-// These are NOT used in the solution branch.
+// looks complete and realistic before wire the data layer.
 
 export const PLACEHOLDER_SEARCH_RESULTS = [
   {
